@@ -1,0 +1,47 @@
+{
+  "copper": {
+    "price": 9500.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "aluminum": {
+    "price": 2400.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "steel": {
+    "price": 800.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "zinc": {
+    "price": 2600.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "nickel": {
+    "price": 16500.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "lead": {
+    "price": 2100.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "electrical_steel": {
+    "price": 3000.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "mineral_oil": {
+    "price": 1200.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  },
+  "insulation_materials": {
+    "price": 4500.0,
+    "unit": "USD/Ton",
+    "date": "2025-03-17"
+  }
+}

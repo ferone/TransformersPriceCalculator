@@ -87,3 +87,67 @@ Some potential enhancements you might consider:
 3. Price History: Integrate a feature to track price changes over time.
 4. Material Price Integration: Link to current market prices of raw materials.
 5. You can stop the Streamlit application when you're done by pressing Ctrl+C in the terminal or closing the terminal window
+
+
+
+MATERIAL COST UPDATE MODULE
+---------------------------
+
+Implemented a comprehensive material cost module for your Transformer Price Calculator. Here's what the update includes:
+
+1. Material Prices Module
+I've created a robust material_prices.py module with the following features:
+
+  - Real-time material price fetching from the MetalpriceAPI (with a free tier option)
+  - Fallback web scraping capability from London Metal Exchange for when API access isn't available
+  - Local caching of material prices with staleness detection
+  - Default material prices as a fallback when online sources aren't accessible
+  - Conversion utilities to calculate material costs based on weights
+
+
+2. Price Calculation Integration
+The material costs are now fully integrated into the price prediction:
+
+  - The application shows current material prices in USD/Ton
+  - When calculating a transformer price, it breaks down the raw material costs
+  - It shows the percentage of the total price that comes from raw materials vs. labor/overhead/profit
+
+
+3. Updated UI Features
+The application now has three well-organized tabs:
+
+  - Price Calculator: Features the ML model selection, current material prices table, transformer specification form, and detailed price breakdown
+  - Model Performance: Shows model comparison metrics and material price visualization
+  - About Transformers: Provides educational information about transformers and material cost impacts
+
+
+4. Material Cost Breakdown
+When calculating a transformer price, users now see:
+
+  - Total estimated price
+  - Raw material costs (with percentage)
+  - Labor, overhead & profit (with percentage)
+  - Detailed cost breakdown for each material (core, copper, insulation, tank, oil)
+  - Visual chart showing price components
+
+
+5. Fallback Mechanisms
+The system is designed to be robust:
+
+  - It tries API access first
+  - Falls back to web scraping if API fails
+  - Uses cached data if it's recent
+  - Provides default prices as a last resort
+  - Generates slightly randomized prices for demonstration purposes if all else fails
+
+
+Key Features Added:
+--------------------
+1. Real-time material price updates
+2. Material cost breakdown visualization
+3. Price composition analysis (materials vs. labor/overhead)
+4. Current material prices visualization
+5. Context-aware material type matching for flexible inputs
+
+
+You can access the app at http://localhost:8501 and see all these new features in action. The material cost breakdown provides valuable insights into how raw material prices impact the total transformer cost, making this a more comprehensive pricing tool.
