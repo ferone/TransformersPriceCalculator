@@ -82,11 +82,11 @@ Possible Improvements
 Some potential enhancements you might consider:
 
 1. Real Data: Replace synthetic data with real market data for greater accuracy.
-
 2. More Features: Add additional technical specifications that affect pricing.
 3. Price History: Integrate a feature to track price changes over time.
-4. Material Price Integration: Link to current market prices of raw materials.
-5. You can stop the Streamlit application when you're done by pressing Ctrl+C in the terminal or closing the terminal window
+4. Material Price Integration: Link to current market prices of raw materials. DONE! 
+
+You can stop the Streamlit application when you're done by pressing Ctrl+C in the terminal or closing the terminal window
 
 
 
