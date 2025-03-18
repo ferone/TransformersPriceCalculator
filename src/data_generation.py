@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 import os
+from weight_estimator import estimate_weights_from_power_and_voltage
 
 def generate_synthetic_data(n_samples=500):
     """
-    Generate synthetic data for transformer price modeling
+    Generate synthetic data for transformer price modeling with realistic weight scaling
+    based on power ratings and voltage levels.
     
     Parameters:
     - n_samples: number of samples to generate
@@ -14,23 +16,55 @@ def generate_synthetic_data(n_samples=500):
     """
     np.random.seed(42)  # for reproducibility
     
-    # Generate features with realistic ranges for transformers
+    # Generate power ratings and voltage levels first
+    power_ratings = np.random.choice([25, 50, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000], n_samples)
+    primary_voltages = np.random.choice([4.16, 12.47, 13.2, 13.8, 24.94, 34.5], n_samples)  # in kV
+    secondary_voltages = np.random.choice([0.12, 0.208, 0.24, 0.277, 0.48, 0.6], n_samples)  # in kV
+    phases = np.random.choice(['Single-phase', 'Three-phase'], n_samples)
+    
+    # Initialize weight columns
+    core_weights = np.zeros(n_samples)
+    copper_weights = np.zeros(n_samples)
+    insulation_weights = np.zeros(n_samples)
+    tank_weights = np.zeros(n_samples)
+    oil_weights = np.zeros(n_samples)
+    total_weights = np.zeros(n_samples)
+    
+    # Calculate realistic weights based on power ratings and voltage levels
+    for i in range(n_samples):
+        weights = estimate_weights_from_power_and_voltage(
+            power_ratings[i], 
+            primary_voltages[i], 
+            secondary_voltages[i],
+            phases[i]
+        )
+        
+        # Add some random variation (±10%) to make the data more realistic
+        variation = np.random.uniform(0.9, 1.1, 6)
+        
+        core_weights[i] = weights['core_weight'] * variation[0]
+        copper_weights[i] = weights['copper_weight'] * variation[1]
+        insulation_weights[i] = weights['insulation_weight'] * variation[2]
+        tank_weights[i] = weights['tank_weight'] * variation[3]
+        oil_weights[i] = weights['oil_weight'] * variation[4]
+        total_weights[i] = weights['total_weight'] * variation[5]
+    
+    # Create base data dictionary
     data = {
         # Power ratings (kVA)
-        'power_rating': np.random.choice([25, 50, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000], n_samples),
+        'power_rating': power_ratings,
         
-        # Primary voltage (V)
-        'primary_voltage': np.random.choice([4160, 12470, 13200, 13800, 24940, 34500], n_samples),
+        # Voltage levels (V)
+        'primary_voltage': primary_voltages * 1000,  # Convert kV to V
+        'secondary_voltage': secondary_voltages * 1000,  # Convert kV to V
         
-        # Secondary voltage (V)
-        'secondary_voltage': np.random.choice([120, 208, 240, 277, 480, 600], n_samples),
-        
-        # Material weights (kg)
-        'core_weight': np.random.uniform(100, 3000, n_samples),
-        'copper_weight': np.random.uniform(50, 2000, n_samples),
-        'insulation_weight': np.random.uniform(20, 500, n_samples),
-        'tank_weight': np.random.uniform(100, 2500, n_samples),
-        'oil_weight': np.random.uniform(200, 4000, n_samples),
+        # Material weights (kg) - now based on realistic scaling
+        'core_weight': core_weights,
+        'copper_weight': copper_weights,
+        'insulation_weight': insulation_weights,
+        'tank_weight': tank_weights,
+        'oil_weight': oil_weights,
+        'total_weight': total_weights,
         
         # Other specifications
         'cooling_type': np.random.choice(['ONAN', 'ONAF', 'OFAF', 'ODAF'], n_samples),
@@ -39,7 +73,7 @@ def generate_synthetic_data(n_samples=500):
         'impedance': np.random.uniform(2.0, 8.0, n_samples),
         
         # Categorical features
-        'phase': np.random.choice(['Single-phase', 'Three-phase'], n_samples),
+        'phase': phases,
         'frequency': np.random.choice([50, 60], n_samples),
         'installation_type': np.random.choice(['Indoor', 'Outdoor'], n_samples),
         'insulation_type': np.random.choice(['Oil', 'Dry'], n_samples),
@@ -51,14 +85,11 @@ def generate_synthetic_data(n_samples=500):
     # Create DataFrame
     df = pd.DataFrame(data)
     
-    # Calculate total weight
-    df['total_weight'] = df['core_weight'] + df['copper_weight'] + df['insulation_weight'] + df['tank_weight'] + df['oil_weight']
-    
     # Generate target variable (price) based on a complex combination of features with some noise
     # Base price is related to power rating
     base_price = df['power_rating'] * 100  
     
-    # Material costs
+    # Material costs - use actual weights instead of random values
     material_cost = (df['core_weight'] * 5 +  # Core material cost
                      df['copper_weight'] * 15 +  # Copper is expensive
                      df['insulation_weight'] * 8 +
@@ -93,15 +124,46 @@ def generate_synthetic_data(n_samples=500):
     
     return df
 
+def verify_weight_scaling(data):
+    """
+    Verify the relationship between power ratings and weights
+    
+    Parameters:
+    - data: DataFrame with transformer data
+    
+    Returns:
+    - DataFrame with average weights by power rating
+    """
+    # Group by power rating and calculate average weights
+    weight_by_power = data.groupby('power_rating').agg({
+        'core_weight': 'mean',
+        'copper_weight': 'mean', 
+        'insulation_weight': 'mean',
+        'tank_weight': 'mean',
+        'oil_weight': 'mean',
+        'total_weight': 'mean'
+    }).reset_index()
+    
+    print("Weight scaling verification:")
+    print(weight_by_power.sort_values('power_rating'))
+    
+    return weight_by_power
+
 if __name__ == "__main__":
     # Generate synthetic data
     transformer_data = generate_synthetic_data(1000)
+    
+    # Verify weight scaling
+    weight_scaling = verify_weight_scaling(transformer_data)
     
     # Create data directory if it doesn't exist
     os.makedirs('../data', exist_ok=True)
     
     # Save to CSV file
     transformer_data.to_csv('../data/transformer_data.csv', index=False)
+    
+    # Save weight scaling data
+    weight_scaling.to_csv('../data/weight_scaling.csv', index=False)
     
     print(f"Generated {len(transformer_data)} transformer data samples and saved to '../data/transformer_data.csv'")
     print("Sample data:")
