@@ -242,7 +242,7 @@ def price_calculator_tab():
     
     # Session state initialization for weight values
     if 'power_rating' not in st.session_state:
-        st.session_state.power_rating = 1000
+        st.session_state.power_rating = 1000.0
     if 'primary_voltage' not in st.session_state:
         st.session_state.primary_voltage = 33.0
     if 'secondary_voltage' not in st.session_state:
@@ -260,12 +260,12 @@ def price_calculator_tab():
             st.session_state.phase
         )
         
-        st.session_state.core_weight = weights["core_weight"]
-        st.session_state.copper_weight = weights["copper_weight"]
-        st.session_state.insulation_weight = weights["insulation_weight"]
-        st.session_state.tank_weight = weights["tank_weight"]
-        st.session_state.oil_weight = weights["oil_weight"]
-        st.session_state.total_weight = weights["total_weight"]
+        st.session_state.core_weight = float(weights["core_weight"])
+        st.session_state.copper_weight = float(weights["copper_weight"])
+        st.session_state.insulation_weight = float(weights["insulation_weight"])
+        st.session_state.tank_weight = float(weights["tank_weight"])
+        st.session_state.oil_weight = float(weights["oil_weight"])
+        st.session_state.total_weight = float(weights["total_weight"])
         st.session_state.weights_estimated = True
     
     # Add weight calculator section outside the form
@@ -275,9 +275,9 @@ def price_calculator_tab():
     with est_col1:
         est_power_rating = st.number_input(
             "Power Rating (kVA)", 
-            min_value=10, 
-            max_value=100000, 
-            value=st.session_state.power_rating,
+            min_value=10.0, 
+            max_value=100000.0, 
+            value=float(st.session_state.power_rating),
             key="est_power_rating"
         )
         
@@ -318,12 +318,12 @@ def price_calculator_tab():
                 st.session_state.power_rating = est_power_rating
                 st.session_state.primary_voltage = est_primary_voltage
                 st.session_state.phase = est_phase
-                st.session_state.core_weight = weights["core_weight"]
-                st.session_state.copper_weight = weights["copper_weight"]
-                st.session_state.insulation_weight = weights["insulation_weight"]
-                st.session_state.tank_weight = weights["tank_weight"]
-                st.session_state.oil_weight = weights["oil_weight"]
-                st.session_state.total_weight = weights["total_weight"]
+                st.session_state.core_weight = float(weights["core_weight"])
+                st.session_state.copper_weight = float(weights["copper_weight"])
+                st.session_state.insulation_weight = float(weights["insulation_weight"])
+                st.session_state.tank_weight = float(weights["tank_weight"])
+                st.session_state.oil_weight = float(weights["oil_weight"])
+                st.session_state.total_weight = float(weights["total_weight"])
                 
                 # Show success message
                 st.success(f"Weights estimated based on {est_power_rating} kVA at {est_primary_voltage} kV!")
@@ -351,9 +351,9 @@ def price_calculator_tab():
         with col1:
             power_rating = st.number_input(
                 "Power Rating (kVA)", 
-                min_value=10, 
-                max_value=100000, 
-                value=st.session_state.power_rating,
+                min_value=10.0, 
+                max_value=100000.0, 
+                value=float(st.session_state.power_rating),
                 key="power_rating"
             )
             
@@ -378,7 +378,7 @@ def price_calculator_tab():
                 "Core Weight (kg)", 
                 min_value=0.0, 
                 max_value=1000000.0,  # Increased from 500000.0
-                value=st.session_state.core_weight,
+                value=float(st.session_state.core_weight),
                 key="core_weight"
             )
             
@@ -386,7 +386,7 @@ def price_calculator_tab():
                 "Copper Weight (kg)", 
                 min_value=0.0, 
                 max_value=1000000.0,  # Increased from 500000.0
-                value=st.session_state.copper_weight,
+                value=float(st.session_state.copper_weight),
                 key="copper_weight"
             )
             
@@ -394,7 +394,7 @@ def price_calculator_tab():
                 "Insulation Weight (kg)", 
                 min_value=0.0, 
                 max_value=500000.0,  # Increased from 200000.0
-                value=st.session_state.insulation_weight,
+                value=float(st.session_state.insulation_weight),
                 key="insulation_weight"
             )
             
@@ -403,7 +403,7 @@ def price_calculator_tab():
                 "Tank Weight (kg)", 
                 min_value=0.0, 
                 max_value=1000000.0,  # Increased from 500000.0
-                value=st.session_state.tank_weight,
+                value=float(st.session_state.tank_weight),
                 key="tank_weight"
             )
             
@@ -411,15 +411,15 @@ def price_calculator_tab():
                 "Oil Weight (kg)", 
                 min_value=0.0, 
                 max_value=1000000.0,  # Increased from 500000.0
-                value=st.session_state.oil_weight,
+                value=float(st.session_state.oil_weight),
                 key="oil_weight"
             )
             
             total_weight = st.number_input(
                 "Total Weight (kg)", 
                 min_value=0.0, 
-                max_value=5000000.0,  # Increased from 2000000.0
-                value=st.session_state.total_weight,
+                max_value=10000000.0,  # Increased from 2000000.0
+                value=float(st.session_state.total_weight),
                 key="total_weight"
             )
         
