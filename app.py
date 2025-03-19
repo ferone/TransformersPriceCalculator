@@ -1,4 +1,14 @@
 import streamlit as st
+import math
+
+# Page configuration must be the first streamlit command
+st.set_page_config(
+    page_title="Transformer Price Calculator",
+    page_icon="visualizations/logo.png",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import numpy as np
 import joblib
@@ -74,13 +84,37 @@ except ImportError as e:
                 "total_weight": round(total_weight, 1)
             }
 
-# Page configuration
-st.set_page_config(
-    page_title="Transformer Price Calculator",
-    page_icon="visualizations/logo.png",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Add CSS to improve the appearance and layout of the app
+st.markdown("""
+<style>
+    .ikutu-title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        text-align: left;
+        letter-spacing: 0.05em;
+        color: #2c3e50;
+    }
+    
+    .ikutu-slogan {
+        color: #3498db;
+        margin-top: 0;
+        text-transform: uppercase;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: left;
+    }
+    
+    .content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        margin-top: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Add requirements check for streamlit
 try:
@@ -166,7 +200,7 @@ def display_feature_importance(model_name):
     if os.path.exists(feature_imp_path):
         st.subheader(f"Feature Importance for {format_model_name(model_name)}")
         image = Image.open(feature_imp_path)
-        st.image(image, use_column_width=True)
+        st.image(image, use_container_width=True)
 
 def price_calculator_tab():
     st.title("Transformer Price Calculator")
@@ -270,42 +304,57 @@ def price_calculator_tab():
     
     # Add weight calculator section outside the form
     st.subheader("Quick Weight Estimator")
-    est_col1, est_col2, est_col3 = st.columns(3)
     
-    with est_col1:
+    # Create a layout with 3 columns: 1 for inputs and 2 for results
+    inputs_col, results_col = st.columns([1, 2])
+    
+    # All inputs in the first column
+    with inputs_col:
         est_power_rating = st.number_input(
             "Power Rating (kVA)", 
             min_value=10.0, 
             max_value=100000.0, 
-            value=float(st.session_state.power_rating),
-            key="est_power_rating"
+            value=1000.0,
+            key="est_power_rating_input"
         )
         
-    with est_col2:
-        est_primary_voltage = st.number_input(
-            "Primary Voltage (kV)", 
-            min_value=0.1, 
-            max_value=1000.0, 
-            value=st.session_state.primary_voltage,
-            key="est_primary_voltage"
-        )
-        
-    with est_col3:
         est_phase = st.selectbox(
             "Phase",
             ["Single-phase", "Three-phase"],
             index=1 if st.session_state.phase == "Three-phase" else 0,
-            key="est_phase"
+            key="est_phase_input"
         )
+        
+        est_primary_voltage = st.number_input(
+            "Primary Voltage (kV)", 
+            min_value=0.1, 
+            max_value=1000.0, 
+            value=33.0,
+            key="est_primary_voltage_input"
+        )
+        
+        est_secondary_voltage = st.number_input(
+            "Secondary Voltage (kV)", 
+            min_value=0.1, 
+            max_value=1000.0, 
+            value=11.0,
+            key="est_secondary_voltage_input"
+        )
+        
+        # Add some spacing before the button
+        st.write("")
+        
+        # Estimate weights button at the bottom of input column
+        estimate_button = st.button("Estimate Weights", key="estimate_weights_button", use_container_width=True)
     
-    estimate_col1, estimate_col2, estimate_col3 = st.columns([1, 2, 1])
-    with estimate_col2:
-        if st.button("Estimate Weights", key="estimate_weights_button"):
+    # Results will be displayed in the wider right column
+    with results_col:
+        if estimate_button:
             try:
                 weights = estimate_weights_from_power_and_voltage(
                     est_power_rating,
                     est_primary_voltage,
-                    11.0,  # Default secondary voltage
+                    est_secondary_voltage,
                     est_phase
                 )
                 
@@ -354,74 +403,89 @@ def price_calculator_tab():
                 min_value=10.0, 
                 max_value=100000.0, 
                 value=float(st.session_state.power_rating),
-                key="power_rating"
+                key="power_rating_input"
             )
+            st.session_state.power_rating = power_rating
             
             primary_voltage = st.number_input(
                 "Primary Voltage (kV)", 
                 min_value=0.1, 
                 max_value=1000.0, 
                 value=st.session_state.primary_voltage,
-                key="primary_voltage"
+                key="primary_voltage_input"
             )
+            st.session_state.primary_voltage = primary_voltage
             
             secondary_voltage = st.number_input(
                 "Secondary Voltage (kV)", 
                 min_value=0.1, 
                 max_value=1000.0, 
                 value=st.session_state.secondary_voltage,
-                key="secondary_voltage"
+                key="secondary_voltage_input"
             )
+            st.session_state.secondary_voltage = secondary_voltage
             
         with col2:
             core_weight = st.number_input(
-                "Core Weight (kg)", 
-                min_value=0.0, 
-                max_value=1000000.0,  # Increased from 500000.0
+                "Core Weight (kg)",
+                min_value=0.0,
+                max_value=100000.0,
                 value=float(st.session_state.core_weight),
-                key="core_weight"
+                key="core_weight_input"  # Changed key to avoid conflict
             )
+            # Update session state after widget interaction
+            st.session_state.core_weight = core_weight
             
             copper_weight = st.number_input(
-                "Copper Weight (kg)", 
-                min_value=0.0, 
-                max_value=1000000.0,  # Increased from 500000.0
+                "Copper Weight (kg)",
+                min_value=0.0,
+                max_value=100000.0,
                 value=float(st.session_state.copper_weight),
-                key="copper_weight"
+                key="copper_weight_input"  # Changed key to avoid conflict
             )
+            # Update session state after widget interaction
+            st.session_state.copper_weight = copper_weight
             
             insulation_weight = st.number_input(
-                "Insulation Weight (kg)", 
-                min_value=0.0, 
-                max_value=500000.0,  # Increased from 200000.0
+                "Insulation Weight (kg)",
+                min_value=0.0,
+                max_value=50000.0,
                 value=float(st.session_state.insulation_weight),
-                key="insulation_weight"
+                key="insulation_weight_input"  # Changed key to avoid conflict
             )
+            # Update session state after widget interaction
+            st.session_state.insulation_weight = insulation_weight
             
         with col3:
             tank_weight = st.number_input(
-                "Tank Weight (kg)", 
-                min_value=0.0, 
-                max_value=1000000.0,  # Increased from 500000.0
+                "Tank Weight (kg)",
+                min_value=0.0,
+                max_value=100000.0,
                 value=float(st.session_state.tank_weight),
-                key="tank_weight"
+                key="tank_weight_input"  # Changed key to avoid conflict
             )
+            # Update session state after widget interaction
+            st.session_state.tank_weight = tank_weight
             
             oil_weight = st.number_input(
-                "Oil Weight (kg)", 
-                min_value=0.0, 
-                max_value=1000000.0,  # Increased from 500000.0
+                "Oil Weight (kg)",
+                min_value=0.0,
+                max_value=100000.0,
                 value=float(st.session_state.oil_weight),
-                key="oil_weight"
+                key="oil_weight_input"  # Changed key to avoid conflict
             )
+            # Update session state after widget interaction
+            st.session_state.oil_weight = oil_weight
             
             total_weight = st.number_input(
-                "Total Weight (kg)", 
-                min_value=0.0, 
-                max_value=10000000.0,  # Increased from 2000000.0
+                "Total Weight (kg)",
+                min_value=0.0,
+                max_value=100000.0,
                 value=float(st.session_state.total_weight),
-                key="total_weight"
+                key="total_weight_input"  # Changed key to avoid conflict
             )
+            # Update session state after widget interaction
+            st.session_state.total_weight = total_weight
         
         # Help text for weight estimation
         st.info("⚖️ Use the 'Quick Weight Estimator' section above to automatically calculate weights based on power and voltage.")
@@ -455,8 +519,9 @@ def price_calculator_tab():
                 "Phase",
                 ["Single-phase", "Three-phase"],
                 index=1 if st.session_state.phase == "Three-phase" else 0,
-                key="phase"
+                key="phase_input"
             )
+            st.session_state.phase = phase
             
         with col3:
             efficiency = st.slider(
@@ -556,8 +621,37 @@ def price_calculator_tab():
                     
                     # Show breakdown
                     st.markdown("#### Price Composition")
-                    st.markdown(f"**Raw Materials:** ${material_cost_total:,.2f} ({material_cost_total/predicted_price*100:.1f}% of total)")
-                    st.markdown(f"**Labor, Overhead & Profit:** ${predicted_price - material_cost_total:,.2f} ({(predicted_price - material_cost_total)/predicted_price*100:.1f}% of total)")
+                    
+                    # Apply scale factor for large transformers (economies of scale)
+                    labor_overhead_profit_pct = (predicted_price - material_cost_total) / predicted_price * 100
+                    
+                    # For large transformers, adjust the labor, overhead & profit percentage
+                    # Transformers above 5000 kVA are considered large
+                    if power_rating > 5000:
+                        # Calculate how many times over the large transformer threshold
+                        scale_factor = math.log10(power_rating / 5000 + 1)
+                        
+                        # Calculate target percentage (reduce from current to 30-40% range for largest transformers)
+                        # Cap the reduction to ensure min 30% for labor, overhead & profit
+                        min_lop_percentage = 30  # minimum percentage for labor, overhead & profit
+                        target_percentage = max(min_lop_percentage, labor_overhead_profit_pct * (1 - scale_factor * 0.2))
+                        
+                        # Adjust the predicted price to achieve the target LOP percentage
+                        adjusted_lop_amount = (material_cost_total * target_percentage) / (100 - target_percentage)
+                        adjusted_price = material_cost_total + adjusted_lop_amount
+                        
+                        st.markdown(f"**Raw Materials:** ${material_cost_total:,.2f} ({material_cost_total/adjusted_price*100:.1f}% of total)")
+                        st.markdown(f"**Labor, Overhead & Profit:** ${adjusted_lop_amount:,.2f} ({target_percentage:.1f}% of total)")
+                        st.markdown(f"**Adjusted Total Price:** ${adjusted_price:,.2f}")
+                        st.info(f"Price adjusted for large transformer economies of scale (original estimate: ${predicted_price:,.2f})")
+                        
+                        # Update the values for the chart
+                        predicted_price = adjusted_price
+                        values = [material_cost_total, adjusted_lop_amount]
+                    else:
+                        st.markdown(f"**Raw Materials:** ${material_cost_total:,.2f} ({material_cost_total/predicted_price*100:.1f}% of total)")
+                        st.markdown(f"**Labor, Overhead & Profit:** ${predicted_price - material_cost_total:,.2f} ({(predicted_price - material_cost_total)/predicted_price*100:.1f}% of total)")
+                        values = [material_cost_total, predicted_price - material_cost_total]
                 
                 with col2:
                     st.markdown("### Raw Material Costs Breakdown")
@@ -574,7 +668,7 @@ def price_calculator_tab():
                     st.subheader("Price Components")
                     fig, ax = plt.subplots(figsize=(6, 4))  # Reduced figure size
                     components = ['Raw Materials', 'Labor, Overhead & Profit']
-                    values = [material_cost_total, predicted_price - material_cost_total]
+                    values = values  # Use the values set above
                     colors = ['#1976D2', '#4CAF50']
                     
                     ax.bar(components, values, color=colors)
@@ -595,96 +689,272 @@ def price_calculator_tab():
 def display_weight_distribution(core_weight, copper_weight, insulation_weight, tank_weight, oil_weight, power_rating):
     """Helper function to display weight distribution visualization"""
     st.subheader("Weight Distribution")
-    col1, col2, col3 = st.columns([1, 2, 1])
     
-    with col2:
-        # Calculate current weights
-        current_weights = {
-            "Core": core_weight,
-            "Copper": copper_weight,
-            "Insulation": insulation_weight,
-            "Tank": tank_weight,
-            "Oil": oil_weight
-        }
+    # Remove the column layout to allow the chart to use more space
+    # Calculate current weights
+    current_weights = {
+        "Core": core_weight,
+        "Copper": copper_weight,
+        "Insulation": insulation_weight,
+        "Tank": tank_weight,
+        "Oil": oil_weight
+    }
+    
+    # Calculate total and percentages
+    current_total = sum(current_weights.values())
+    if current_total > 0:  # Avoid division by zero
+        # Create pie chart with larger figure size
+        fig, ax = plt.subplots(figsize=(10, 8))
         
-        # Calculate total and percentages
-        current_total = sum(current_weights.values())
-        if current_total > 0:  # Avoid division by zero
-            # Create pie chart
-            fig, ax = plt.subplots(figsize=(6, 4))
-            
-            # Define custom colors for better visualization
-            colors = ['#1976D2', '#FFA000', '#4CAF50', '#9C27B0', '#F44336']
-            
-            # Create the pie chart
-            wedges, texts, autotexts = ax.pie(
-                current_weights.values(), 
-                labels=current_weights.keys(),
-                autopct='%1.1f%%',
-                startangle=90,
-                colors=colors
-            )
-            
-            # Equal aspect ratio ensures the pie chart is circular
-            ax.axis('equal')
-            
-            # Customize the appearance
-            plt.setp(autotexts, size=9, weight="bold")
-            plt.setp(texts, size=10)
-            
-            ax.set_title('Transformer Weight Distribution')
-            
-            # Add a legend with weight values
-            legend_labels = [f"{name}: {weight:,.1f} kg ({weight/current_total*100:.1f}%)" 
-                            for name, weight in current_weights.items()]
-            ax.legend(wedges, legend_labels, title="Components", 
-                     loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
-            
-            plt.tight_layout()
-            st.pyplot(fig, use_container_width=False)
-            
-            # Add informational text
-            st.caption(f"Total Weight: {current_total:,.1f} kg | Power Density: {power_rating/current_total:.2f} kVA/kg")
-        else:
-            st.info("Please enter non-zero weight values to see the distribution chart.")
+        # Define custom colors for better visualization
+        colors = ['#1976D2', '#FFA000', '#4CAF50', '#9C27B0', '#F44336']
+        
+        # Create the pie chart
+        wedges, texts, autotexts = ax.pie(
+            current_weights.values(), 
+            labels=current_weights.keys(),
+            autopct='%1.1f%%',
+            startangle=90,
+            colors=colors,
+            textprops={'fontsize': 12}  # Increase font size for labels
+        )
+        
+        # Equal aspect ratio ensures the pie chart is circular
+        ax.axis('equal')
+        
+        # Customize the appearance with larger text sizes
+        plt.setp(autotexts, size=12, weight="bold")  # Increased from 9 to 12
+        plt.setp(texts, size=14)  # Increased from 10 to 14
+        
+        ax.set_title('Transformer Weight Distribution', fontsize=16)  # Increased title size
+        
+        # Add a legend with weight values and larger font
+        legend_labels = [f"{name}: {weight:,.1f} kg ({weight/current_total*100:.1f}%)" 
+                        for name, weight in current_weights.items()]
+        ax.legend(wedges, legend_labels, title="Components", 
+                title_fontsize=14,  # Increase title font size
+                fontsize=12,  # Increase legend text size
+                loc="center left", 
+                bbox_to_anchor=(1, 0, 0.5, 1))
+        
+        # Adjust layout to accommodate the larger chart
+        plt.tight_layout(pad=2.0)
+        
+        # Use full container width for better visibility
+        st.pyplot(fig, use_container_width=True)
+        
+        # Add informational text with larger font
+        st.markdown(f"**Total Weight: {current_total:,.1f} kg | Power Density: {power_rating/current_total:.2f} kVA/kg**")
+    else:
+        st.info("Please enter non-zero weight values to see the distribution chart.")
 
 def model_performance_tab():
-    st.header("Model Performance Analysis")
-    display_model_performance()
+    st.header("Model Performance")
     
-    # Add a section for material price trends (if we implement that later)
-    st.subheader("Current Material Prices")
     try:
-        prices_df = get_current_prices_dataframe()
-        st.dataframe(prices_df, hide_index=True)
+        # Load model performance data
+        performance_df = pd.read_csv("models/model_performance_summary.csv")
         
-        # Create centered columns for the material prices chart
-        chart_col1, chart_col2, chart_col3 = st.columns([1, 2, 1])
+        # Display model performance table
+        st.dataframe(performance_df)
         
-        with chart_col2:
-            # Display material prices visualization
-            st.subheader("Material Prices Visualization")
-            fig, ax = plt.subplots(figsize=(6, 4))  # Smaller figure size
-            
-            # Extract materials and their prices
-            materials = prices_df["Material"].tolist()
-            # Remove the word "Per Ton" from the Price column and convert to float
-            prices = [float(price.replace("$", "").replace(",", "").replace("/Ton", "")) 
-                     for price in prices_df["Price (USD/Ton)"].tolist()]
-            
-            # Create horizontal bar chart
-            ax.barh(materials, prices, color='#1976D2')
-            ax.set_xlabel('USD per Ton')
-            ax.set_title('Current Material Prices (USD/Ton)')
-            
-            # Add values at the end of each bar
-            for i, v in enumerate(prices):
-                ax.text(v + 0.1, i, f'${v:,.2f}', va='center')
-            
-            plt.tight_layout()
-            st.pyplot(fig, use_container_width=False)
+        # Create bar chart of model performance metrics
+        st.subheader("Model Comparison")
+        
+        # RMSE Comparison
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(performance_df['Model'], performance_df['RMSE'])
+        ax.set_title('Root Mean Square Error (RMSE) by Model')
+        ax.set_ylabel('RMSE (lower is better)')
+        plt.xticks(rotation=45, ha='right')
+        st.pyplot(fig)
+        
+        # R² Comparison
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(performance_df['Model'], performance_df['R²'])
+        ax.set_title('R² Score by Model')
+        ax.set_ylabel('R² (higher is better)')
+        plt.xticks(rotation=45, ha='right')
+        st.pyplot(fig)
+        
     except Exception as e:
-        st.warning(f"Could not load current material prices: {str(e)}")
+        st.error(f"Error loading model performance data: {str(e)}")
+        st.info("Train models first to generate performance metrics")
+
+def training_data_tab():
+    st.header("Training Data")
+    st.write("This tab displays the synthetic data used to train the transformer price prediction models.")
+    
+    # Try to load the training data
+    try:
+        # First try the direct path
+        if os.path.exists("data/transformer_data.csv"):
+            data_path = "data/transformer_data.csv"
+        # Then try the relative path
+        elif os.path.exists("../data/transformer_data.csv"):
+            data_path = "../data/transformer_data.csv"
+        # If neither exists, generate new data
+        else:
+            st.info("Training data file not found. Generating new synthetic data...")
+            
+            # Import the data generation function
+            try:
+                # Try to import weight_estimator first since data_generation depends on it
+                try:
+                    from src.weight_estimator import estimate_weights_from_power_and_voltage
+                except ImportError:
+                    # Try relative import
+                    sys.path.append(os.path.abspath("."))
+                    from weight_estimator import estimate_weights_from_power_and_voltage
+                
+                # Now try to import data_generation
+                try:
+                    from src.data_generation import generate_synthetic_data
+                except ImportError:
+                    # Try relative import if the first one fails
+                    from data_generation import generate_synthetic_data
+            except ImportError as ie:
+                st.error(f"Could not import required modules: {str(ie)}")
+                st.info("Make sure the src directory contains weight_estimator.py and data_generation.py files.")
+                return
+            
+            # Generate sample data
+            df = generate_synthetic_data(n_samples=500)
+            
+            # Create data directory if it doesn't exist
+            os.makedirs("data", exist_ok=True)
+            
+            # Save the data for future use
+            df.to_csv("data/transformer_data.csv", index=False)
+            st.success("Generated new training data and saved to 'data/transformer_data.csv'")
+            
+            data_path = "data/transformer_data.csv"
+        
+        # Read the data
+        df = pd.read_csv(data_path)
+        
+        # Add information about the dataset
+        st.subheader("Dataset Information")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Number of Samples", len(df))
+        with col2:
+            st.metric("Number of Features", len(df.columns) - 1)  # Exclude price column
+        
+        # Display basic statistics
+        st.subheader("Dataset Statistics")
+        st.write(df.describe())
+        
+        # Display correlation with price
+        st.subheader("Feature Correlations with Price")
+        
+        # Identify categorical columns
+        categorical_cols = df.select_dtypes(include=['object', 'bool']).columns.tolist()
+        numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+        
+        # Create a new DataFrame for correlation analysis
+        # Keep only numerical columns initially
+        df_corr = df[numerical_cols].copy()
+        
+        # Add dummy variables for categorical columns
+        for col in categorical_cols:
+            # Skip if column is all NaN
+            if df[col].isna().all():
+                continue
+                
+            # Create dummy variables and add to correlation DataFrame
+            dummies = pd.get_dummies(df[col], prefix=col, drop_first=False)
+            df_corr = pd.concat([df_corr, dummies], axis=1)
+        
+        # Calculate correlations with price
+        if 'price' in df_corr.columns:
+            correlations = df_corr.corr()['price'].sort_values(ascending=False)
+            
+            # Filter out the price correlation with itself
+            correlations = correlations.drop('price')
+            
+            # Display top 15 positive correlations and top 15 negative correlations
+            st.write("Top correlations with price:")
+            
+            # Create two columns for positive and negative correlations
+            pos_col, neg_col = st.columns(2)
+            
+            with pos_col:
+                st.write("Positive correlations:")
+                st.dataframe(correlations.head(15))
+            
+            with neg_col:
+                st.write("Negative correlations:")
+                st.dataframe(correlations.tail(15))
+            
+            # Create bar chart of correlations (top 10 positive and top 10 negative)
+            fig, ax = plt.subplots(figsize=(10, 8))
+            
+            # Get top 10 positive and negative correlations
+            top_positive = correlations.head(10)
+            top_negative = correlations.tail(10).iloc[::-1]  # Reverse order for display
+            
+            # Combine and sort for better visualization
+            top_correlations = pd.concat([top_positive, top_negative])
+            
+            # Plot
+            colors = ['green' if x > 0 else 'red' for x in top_correlations]
+            top_correlations.plot(kind='barh', ax=ax, color=colors)
+            ax.set_title('Top Feature Correlations with Price')
+            ax.set_xlabel('Correlation Coefficient')
+            ax.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
+            st.pyplot(fig)
+        else:
+            st.warning("Price column not found in the dataset. Cannot calculate correlations.")
+        
+        # Allow user to explore the raw data
+        st.subheader("Raw Training Data")
+        st.dataframe(df)
+        
+        # Add data download option
+        csv = df.to_csv(index=False)
+        st.download_button(
+            label="Download Training Data as CSV",
+            data=csv,
+            file_name="transformer_training_data.csv",
+            mime="text/csv"
+        )
+        
+    except Exception as e:
+        st.error(f"Error loading or processing training data: {str(e)}")
+        st.info("Unable to display training data. Check if the data directory exists and contains transformer_data.csv file.")
+        
+        # Add option to generate new data if error occurs
+        if st.button("Generate New Training Data"):
+            try:
+                # Try to import weight_estimator first since data_generation depends on it
+                try:
+                    from src.weight_estimator import estimate_weights_from_power_and_voltage
+                except ImportError:
+                    # Try relative import
+                    sys.path.append(os.path.abspath("."))
+                    from weight_estimator import estimate_weights_from_power_and_voltage
+                
+                # Now try to import data_generation
+                try:
+                    from src.data_generation import generate_synthetic_data
+                except ImportError:
+                    # Try relative import if the first one fails
+                    from data_generation import generate_synthetic_data
+                
+                # Generate sample data
+                df = generate_synthetic_data(n_samples=500)
+                
+                # Create data directory if it doesn't exist
+                os.makedirs("data", exist_ok=True)
+                
+                # Save the data for future use
+                df.to_csv("data/transformer_data.csv", index=False)
+                st.success("Generated new training data and saved to 'data/transformer_data.csv'")
+                st.info("Please refresh the page to view the data.")
+            except Exception as gen_error:
+                st.error(f"Error generating new data: {str(gen_error)}")
+                st.code(traceback.format_exc(), language="python")
 
 def machine_learning_tab():
     st.header("Understanding Machine Learning Models")
@@ -948,37 +1218,49 @@ def about_transformers_tab():
     
     # Add an image of a transformer with key components labeled
     try:
-        st.image("visualizations/transformer_diagram.png", caption="Transformer Key Components", use_column_width=True)
+        st.image("visualizations/transformer_diagram.png", caption="Transformer Key Components", use_container_width=True)
     except:
         st.info("Transformer diagram image not available")
+
+# Add a function to load and encode the image as base64
+def get_base64_image(image_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            import base64
+            return base64.b64encode(img_file.read()).decode()
+    except Exception as e:
+        st.error(f"Error loading image: {str(e)}")
+        return ""
 
 def main():
     # Create necessary directories
     os.makedirs("data", exist_ok=True)
     os.makedirs("visualizations", exist_ok=True)
     
-    # App title and logo with company name and catchphrase
-    col1, col2 = st.columns([1, 4])
+    # Create a layout with tighter columns for logo and title
+    logo_col, title_col, spacer_col = st.columns([1, 3, 2])
     
-    with col1:
+    # Logo in the first column
+    with logo_col:
         try:
             st.image("visualizations/logo.png", width=100)
-        except:
-            st.write("⚡") # Fallback to lightning emoji if logo not found
+        except Exception as e:
+            st.write("Logo not found")
     
-    with col2:
+    # Title and slogan in the second column, with CSS to align it closer to the logo
+    with title_col:
         st.markdown("""
-        <div style='display: flex; flex-direction: column; align-items: flex-start; justify-content: center; height: 100%;'>
-            <h1 style='margin-bottom: 0px; padding-bottom: 0px;'>IKUTU</h1>
-            <p style='color: #FFD700; margin-top: 0px; text-transform: uppercase; font-size: 0.9em; font-weight: 500;'>SUSTAINABLE ENERGY SOLUTIONS</p>
+        <div class="content-container" style="margin-left: -20px; margin-top: 10px;">
+            <h1 class="ikutu-title">IKUTU</h1>
+            <p class="ikutu-slogan">SUSTAINABLE ENERGY SOLUTIONS</p>
         </div>
         """, unsafe_allow_html=True)
-        
+    
     st.title("Transformer Price Calculator")
     st.write("Estimate power transformer prices based on specifications using machine learning models")
     
-    # Create tabs for different sections - adding the new Machine Learning tab
-    tab1, tab2, tab3, tab4 = st.tabs(["Price Calculator", "Model Performance", "Machine Learning", "About Transformers"])
+    # Create tabs for different sections
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Price Calculator", "Model Performance", "Training Data", "Machine Learning", "About Transformers"])
     
     with tab1:
         price_calculator_tab()
@@ -987,9 +1269,12 @@ def main():
         model_performance_tab()
     
     with tab3:
-        machine_learning_tab()
+        training_data_tab()
     
     with tab4:
+        machine_learning_tab()
+    
+    with tab5:
         about_transformers_tab()
 
 if __name__ == "__main__":

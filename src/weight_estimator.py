@@ -13,7 +13,7 @@ from typing import Dict, Tuple, List, Optional, Union
 
 # MAKSAN transformer data and other industry standards
 # Power ratings in kVA
-POWER_RATINGS = [25, 50, 100, 160, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+POWER_RATINGS = [25, 50, 100, 160, 250, 400, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 5000, 10000, 20000, 40000, 80000, 120000, 200000]
 
 # Primary voltage levels in kV
 PRIMARY_VOLTAGES = [6.3, 10.5, 15.75, 20, 35]
@@ -32,11 +32,22 @@ BASE_WEIGHTS = {
 
 # Scaling exponents for different materials
 SCALING_EXPONENTS = {
-    "core": 0.75,       # Core weight scales with power^0.75
-    "copper": 0.85,     # Copper weight scales with power^0.85
-    "insulation": 0.7,  # Insulation scales with power^0.7
-    "tank": 0.65,       # Tank weight scales with power^0.65
-    "oil": 0.8,         # Oil weight scales with power^0.8
+    "core": 0.60,       # Further reduced from 0.65 to 0.60 for better large transformer accuracy
+    "copper": 0.65,     # Further reduced from 0.70 to 0.65 for better large transformer accuracy
+    "insulation": 0.55, # Further reduced from 0.60 to 0.55 for better large transformer accuracy
+    "tank": 0.50,       # Further reduced from 0.55 to 0.50 for better large transformer accuracy
+    "oil": 0.60,        # Further reduced from 0.70 to 0.60 for better large transformer accuracy
+}
+
+# Correction factors for large transformers (MVA range)
+# These factors help adjust the weight estimates for very large transformers
+LARGE_TRANSFORMER_CORRECTION = {
+    "threshold_kva": 5000,  # Apply correction above this kVA rating
+    "core": 0.75,           # Improved from 0.85 to 0.75 for better large transformer accuracy 
+    "copper": 0.70,         # Improved from 0.80 to 0.70 for better large transformer accuracy
+    "insulation": 0.80,     # Improved from 0.90 to 0.80 for better large transformer accuracy
+    "tank": 0.75,           # Improved from 0.85 to 0.75 for better large transformer accuracy
+    "oil": 0.80,            # Improved from 0.90 to 0.80 for better large transformer accuracy
 }
 
 # Voltage adjustment factors - higher voltages require more insulation and larger clearances
@@ -78,6 +89,17 @@ PHASE_MAPPING = {
     "THREE-PHASE": "three",
     "Single phase": "single",
     "Three phase": "three"
+}
+
+# Special adjustments for ultra-large transformers (>50 MVA)
+ULTRA_LARGE_ADJUSTMENTS = {
+    "threshold_mva": 50,       # Threshold in MVA where ultra-large adjustments begin
+    "max_reduction": 0.35,     # Maximum reduction in weight for largest transformers
+    "power_density_target": {  # Target power density by MVA range (in kVA/kg)
+        50: 1.5,               # 50 MVA - target around 1.5 kVA/kg
+        100: 1.8,              # 100 MVA - target around 1.8 kVA/kg
+        200: 2.2               # 200 MVA - target around 2.2 kVA/kg
+    }
 }
 
 def get_power_ratings() -> List[int]:
@@ -158,6 +180,33 @@ def estimate_weights_from_power_and_voltage(
     voltage_ratio = (primary_voltage + 0.1) / (secondary_voltage + 0.1)
     voltage_factor = math.log10(voltage_ratio + 1) + 1
     
+    # Apply large transformer correction if power rating exceeds threshold
+    large_transformer_factor = 1.0
+    if power_rating >= LARGE_TRANSFORMER_CORRECTION["threshold_kva"]:
+        # Calculate how many times over the threshold we are
+        scale_factor = math.log10(power_rating / LARGE_TRANSFORMER_CORRECTION["threshold_kva"] + 1)
+        # The correction becomes more significant as the power rating increases
+        large_transformer_factor = math.pow(scale_factor, 0.5)  # Changed from 0.3 to 0.5 for stronger effect
+    
+    # Special compensation for ultra-large transformers (>50 MVA)
+    ultra_large_compensation = 1.0
+    if power_rating > ULTRA_LARGE_ADJUSTMENTS["threshold_mva"] * 1000:  # Convert MVA to kVA
+        # Calculate MVA for easier comparisons
+        power_mva = power_rating / 1000
+        
+        # Additional scaling factor that grows logarithmically with size
+        ultra_large_factor = math.log10(power_mva / ULTRA_LARGE_ADJUSTMENTS["threshold_mva"] + 1)
+        
+        # Calculate maximum reduction percentage based on size
+        max_reduction_percentage = ULTRA_LARGE_ADJUSTMENTS["max_reduction"] * ultra_large_factor
+        
+        # Cap the reduction to avoid unrealistic values
+        if max_reduction_percentage > ULTRA_LARGE_ADJUSTMENTS["max_reduction"]:
+            max_reduction_percentage = ULTRA_LARGE_ADJUSTMENTS["max_reduction"]
+            
+        # Apply the reduction
+        ultra_large_compensation = 1.0 - max_reduction_percentage
+    
     # Calculate estimated weights
     weights = {}
     total_weight = 0
@@ -171,6 +220,16 @@ def estimate_weights_from_power_and_voltage(
         "oil": "oil_weight"
     }
     
+    # Component-specific adjustment factors for ultra-large transformers
+    # Different components scale differently at ultra-large sizes
+    ultra_large_component_factors = {
+        "core": 1.0,       # Core doesn't benefit as much from economies of scale
+        "copper": 0.9,     # Copper windings benefit more from optimal design
+        "insulation": 0.85, # Insulation benefits from advanced materials
+        "tank": 0.95,      # Tank doesn't benefit as much from economies of scale
+        "oil": 0.9         # Oil benefits from more efficient cooling designs
+    }
+    
     for component in BASE_WEIGHTS:
         # Apply power scaling with appropriate exponent
         weight = BASE_WEIGHTS[component] * (power_ratio ** SCALING_EXPONENTS[component])
@@ -181,6 +240,19 @@ def estimate_weights_from_power_and_voltage(
         
         # Apply phase adjustment
         weight *= PHASE_ADJUSTMENT[normalized_phase][component]
+        
+        # Apply large transformer correction if applicable
+        if power_rating >= LARGE_TRANSFORMER_CORRECTION["threshold_kva"]:
+            # Apply component-specific large transformer correction
+            correction = LARGE_TRANSFORMER_CORRECTION[component]
+            # The correction increases with transformer size
+            correction_factor = 1.0 - ((1.0 - correction) * large_transformer_factor)
+            weight *= correction_factor
+        
+        # Apply ultra-large transformer compensation (>50 MVA)
+        if power_rating > ULTRA_LARGE_ADJUSTMENTS["threshold_mva"] * 1000:
+            # Apply component-specific adjustment factor
+            weight *= ultra_large_compensation * ultra_large_component_factors[component]
         
         # Add some realistic variation (±5%)
         weight *= np.random.uniform(0.95, 1.05)
@@ -195,6 +267,40 @@ def estimate_weights_from_power_and_voltage(
     
     # Add total weight
     weights["total_weight"] = total_weight
+    
+    # Power density check for ultra-large transformers
+    # If power density is below target, adjust weights to achieve target
+    if power_rating > ULTRA_LARGE_ADJUSTMENTS["threshold_mva"] * 1000:
+        power_mva = power_rating / 1000
+        current_power_density = power_rating / total_weight
+        
+        # Determine target power density through interpolation
+        target_density = None
+        for target_mva in sorted(ULTRA_LARGE_ADJUSTMENTS["power_density_target"].keys()):
+            if power_mva <= target_mva:
+                if target_density is None:
+                    # First target found, use it directly
+                    target_density = ULTRA_LARGE_ADJUSTMENTS["power_density_target"][target_mva]
+                break
+            target_density = ULTRA_LARGE_ADJUSTMENTS["power_density_target"][target_mva]
+        
+        # If we're beyond the largest defined MVA, use the highest defined target
+        if target_density is None:
+            largest_mva = max(ULTRA_LARGE_ADJUSTMENTS["power_density_target"].keys())
+            target_density = ULTRA_LARGE_ADJUSTMENTS["power_density_target"][largest_mva]
+        
+        # If current density is too low, adjust weights
+        if current_power_density < target_density * 0.9:  # Allow 10% below target
+            # Calculate adjustment factor to reach target
+            adjustment_factor = current_power_density / target_density
+            
+            # Apply adjustment to each component
+            for component, output_key in component_output_keys.items():
+                weights[output_key] = round(weights[output_key] * adjustment_factor)
+            
+            # Recalculate total weight
+            total_weight = sum(weights[k] for k in component_output_keys.values())
+            weights["total_weight"] = total_weight
     
     return weights
 
@@ -275,7 +381,7 @@ def calculate_weight_distribution(weights: Dict[str, float]) -> Dict[str, float]
 
 if __name__ == "__main__":
     # Test the weight estimation
-    test_power_ratings = [100, 500, 1000, 2000]
+    test_power_ratings = [100, 500, 1000, 5000, 10000, 50000, 90000, 200000]
     
     print("Example Weight Estimations:")
     print("--------------------------")
@@ -300,7 +406,7 @@ if __name__ == "__main__":
             secondary_voltage=0.4
         )
         
-        print(f"\n{power} kVA Transformer:")
+        print(f"\n{power} kVA Transformer ({power/1000:.1f} MVA):")
         # Display results with new key names
         component_display_names = {
             "core_weight": "Core",
@@ -314,5 +420,5 @@ if __name__ == "__main__":
             weight = weights[key]
             print(f"  {display_name}: {weight} kg ({weight/weights['total_weight']*100:.1f}%)")
         
-        print(f"  Total Weight: {weights['total_weight']} kg")
+        print(f"  Total Weight: {weights['total_weight']} kg ({weights['total_weight']/1000:.2f} tons)")
         print(f"  Power Density: {calculate_power_density(weights['total_weight'], power):.3f} kVA/kg") 

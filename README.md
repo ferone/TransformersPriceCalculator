@@ -151,3 +151,25 @@ Key Features Added:
 
 
 You can access the app at http://localhost:8501 and see all these new features in action. The material cost breakdown provides valuable insights into how raw material prices impact the total transformer cost, making this a more comprehensive pricing tool.
+
+
+
+Labor, overhead, and profit
+------------------------------
+
+Implemented a solution to adjust the labor, overhead, and profit percentage for large transformers. Here's what my changes do:
+Adjusted Pricing Model for Large Transformers
+Size Threshold: I've set 5000 kVA as the threshold for "large transformers" - above this size, the economies of scale adjustment begins to apply.
+Scaling Factor: The adjustment uses a logarithmic scaling factor based on how much larger the transformer is than the threshold. This ensures that:
+Very large transformers (e.g., 100,000+ kVA) get a significant adjustment
+Moderately large transformers (e.g., 10,000 kVA) get a modest adjustment
+Transformers near the threshold get minimal adjustment
+Target Percentage: The algorithm reduces the labor, overhead, and profit percentage from whatever the model initially predicted to a target range of 30-40% for the largest transformers, which aligns with your industry knowledge.
+Price Adjustment: Instead of just changing the display percentages, the code recalculates the total price based on the adjusted labor, overhead, and profit amount, giving you a more realistic final estimate.
+Transparency: The app shows both the original model estimate and the adjusted price with a clear explanation of the adjustment.
+Benefits of This Approach
+Industry-Standard Economics: This change better reflects the economies of scale in transformer manufacturing, where larger units have a lower percentage of labor costs relative to material costs.
+More Competitive Pricing: For very large transformers, the adjusted prices will be more in line with market expectations and more competitive.
+Maintains Material Cost Accuracy: The raw material cost calculation remains unchanged and accurate based on current material prices.
+Flexible Implementation: The scaling factor approach means we don't need hard cutoffs - the adjustment gradually increases with transformer size.
+Try entering specifications for a large transformer (>5000 kVA) in the app to see how the price adjustment works. The larger the transformer, the more significant the adjustment will be, gradually bringing the labor, overhead, and profit percentage down toward the 30-40% range you specified.
