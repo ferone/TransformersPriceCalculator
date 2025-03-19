@@ -1,0 +1,191 @@
+Phase,Frequency (Hz),Unit Price (USD),Primary Voltage (kV),Secondary Voltage (kV),Type,Data Source,Power Rating (KVA)
+Three-phase,50.0,41862.865,11.0,0.433,Power,Real (Market),4000.0
+Three-phase,50.0,32144.4775,11.0,0.433,Power,Real (Market),3150.0
+Three-phase,50.0,329978.47,11.0,132.0,Power,Real (Market),35000.0
+Three-phase,50.0,1518447.55,11.0,0.433,Power,Real (Market),533000.0
+Three-phase,50.0,894031.1,11.0,0.433,Power,Real (Market),42000.0
+Three-phase,50.0,492541.52,11.0,0.433,Power,Real (Market),15000.0
+Three-phase,50.0,76177.32,33.0,0.75,Power,Real (Market),12000.0
+Three-phase,50.0,797479.62,11.0,0.433,Power,Real (Market),48000.0
+Three-phase,50.0,54978.33,33.0,11.0,Power,Real (Market),13330.0
+Three-phase,50.0,942406.42,220.0,132.0,Power,Real (Market),150000.0
+Three-phase,50.0,882070.95,11.0,0.433,Power,Real (Market),48000.0
+Three-phase,50.0,1707636.1,11.0,0.433,Power,Real (Market),16000.0
+Three-phase,50.0,1973.68,11.0,0.433,Power,Real (Market),14000.0
+Three-phase,50.0,4.594142219387755,11.0,0.433,Power,Real (Market),14000.0
+Three-phase,50.0,692285.0,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,228400.0,12075.0,0.651,Power,Real (Market),12155.0
+Three-phase,50.0,969916.18,220.0,132.0,Power,Real (Market),150000.0
+Three-phase,50.0,890691.6,132.0,33.0,Power,Real (Market),50000.0
+Three-phase,50.0,385626.83,11.0,0.433,Power,Real (Market),8500.0
+Three-phase,50.0,385626.83,11.0,0.433,Power,Real (Market),8500.0
+Three-phase,50.0,385626.83,11.0,0.433,Power,Real (Market),8500.0
+Three-phase,50.0,651025.0,11.0,0.433,Power,Real (Market),50000.0
+Three-phase,50.0,726088.2,11.0,0.433,Power,Real (Market),50000.0
+Three-phase,50.0,651025.0,11.0,0.433,Power,Real (Market),50000.0
+Three-phase,50.0,726088.2,11.0,0.433,Power,Real (Market),50000.0
+Three-phase,50.0,651025.0,11.0,0.433,Power,Real (Market),50000.0
+Three-phase,50.0,71325.17,0.4,11.0,Power,Real (Market),2200.0
+Three-phase,50.0,1063321.24,11.0,0.433,Power,Real (Market),120000.0
+Three-phase,50.0,1063321.24,11.0,0.433,Power,Real (Market),120000.0
+Three-phase,50.0,1063321.24,11.0,0.433,Power,Real (Market),120000.0
+Three-phase,50.0,1063321.24,11.0,0.433,Power,Real (Market),120000.0
+Three-phase,50.0,538549.5,11.0,0.433,Power,Real (Market),23000.0
+Three-phase,50.0,538549.5,11.0,0.433,Power,Real (Market),23000.0
+Three-phase,50.0,696.78,0.4,11.0,Power,Real (Market),2200.0
+Three-phase,50.0,118985.2,11.0,0.433,Power,Real (Market),20000.0
+Three-phase,50.0,626931.92,3.0,33.0,Power,Real (Market),105000.0
+Three-phase,50.0,626931.92,3.0,33.0,Power,Real (Market),105000.0
+Three-phase,50.0,692158.51,132.0,33.0,Power,Real (Market),60000.0
+Three-phase,50.0,626931.92,3.0,33.0,Power,Real (Market),105000.0
+Three-phase,50.0,626931.92,3.0,33.0,Power,Real (Market),105000.0
+Three-phase,50.0,290741.62,33.0,11.5,Power,Real (Market),15000.0
+Three-phase,50.0,136500.0,11.0,0.433,Power,Real (Market),25000.0
+Three-phase,50.0,200.7116949318694,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,1653400.0,11.0,0.433,Power,Real (Market),375000.0
+Three-phase,50.0,692158.51,132.0,33.0,Power,Real (Market),60000.0
+Three-phase,50.0,203959.2,67.0,13.2,Power,Real (Market),5000.0
+Three-phase,50.0,136500.0,11.0,0.433,Power,Real (Market),25000.0
+Three-phase,50.0,200.7116949318694,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,1653400.0,11.0,0.433,Power,Real (Market),375000.0
+Three-phase,50.0,325315.2,11.0,0.433,Power,Real (Market),25000.0
+Three-phase,50.0,156730.0,11.0,0.433,Power,Real (Market),20000.0
+Three-phase,50.0,1396847.5,11.0,0.433,Power,Real (Market),325000.0
+Three-phase,50.0,294656.6666666667,11.0,0.433,Power,Real (Market),120000.0
+Three-phase,50.0,184741.2,11.0,0.433,Power,Real (Market),25000.0
+Three-phase,50.0,82500.0,11.0,0.433,Power,Real (Market),16000.0
+Three-phase,50.0,458225.0,11.0,0.433,Power,Real (Market),120000.0
+Three-phase,50.0,45000.0,11.0,0.433,Power,Real (Market),10000.0
+Three-phase,50.0,10000.0,11.0,0.433,Power,Real (Market),10000.0
+Three-phase,50.0,1240597.5,11.0,0.433,Power,Real (Market),450000.0
+Three-phase,50.0,140052.25,11.0,0.433,Power,Real (Market),31500.0
+Three-phase,50.0,84000.0,11.0,0.433,Power,Real (Market),14000.0
+Three-phase,50.0,1116766.17,11.0,0.433,Power,Real (Market),100000.0
+Three-phase,50.0,1589744.4875,11.0,0.433,Power,Real (Market),100000.0
+Three-phase,50.0,353498.0,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,718403.93,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,600538.46,11.0,0.433,Power,Real (Market),80000.0
+Three-phase,50.0,583258.04,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,583258.04,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,132199.05,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,132777.92,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,133185.1,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,133185.1,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134996.6,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134996.6,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,135511.78,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,135508.9,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134551.67,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134551.67,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134530.56,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134551.38,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,132878.89,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,135947.64,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,972500.0,11.0,0.433,Power,Real (Market),60000.0
+Three-phase,50.0,718403.93,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,600538.46,11.0,0.433,Power,Real (Market),80000.0
+Three-phase,50.0,583258.04,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,583258.04,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,132199.05,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,132777.92,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,133185.1,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,133185.1,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134996.6,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134996.6,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,135511.78,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,135508.9,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134551.67,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134551.67,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134530.56,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,134551.38,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,132878.89,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,135947.64,11.0,0.433,Power,Real (Market),75000.0
+Three-phase,50.0,13972.714064106956,400.0,3.3,Power,Synthetic,740.1466464390786
+Three-phase,50.0,16672.018909477756,66.0,0.22,Distribution,Synthetic,735.7959601699805
+Three-phase,50.0,15910.387297578804,132.0,0.4,Power,Synthetic,684.7390707145072
+Three-phase,50.0,5722.130649795382,6.6,3.3,Power,Synthetic,296.4577316467744
+Three-phase,50.0,9776.988008877212,22.0,3.3,Distribution,Synthetic,408.1358028463856
+Three-phase,50.0,5692.330222222546,66.0,11.0,Power,Synthetic,301.9702954812892
+Single-phase,50.0,7830.231609804689,33.0,6.6,Distribution,Synthetic,486.81722525001726
+Three-phase,50.0,5760.863401811719,220.0,0.22,Distribution,Synthetic,248.09132578866544
+Three-phase,50.0,20534.4012034698,66.0,0.69,Power,Synthetic,951.259756852732
+Single-phase,50.0,9904.816979665493,6.6,0.69,Distribution,Synthetic,461.2272248445552
+Three-phase,50.0,4025.876266732328,33.0,0.433,Instrument,Synthetic,239.83187877639944
+Three-phase,60.0,7135.007384359255,132.0,0.4,Distribution,Synthetic,305.90317044146883
+Three-phase,50.0,16123.03792633785,66.0,11.0,Power,Synthetic,684.9247042593767
+Three-phase,60.0,10967.935490794816,400.0,0.433,Distribution,Synthetic,611.9359625365299
+Three-phase,50.0,14722.822382630766,66.0,0.4,Distribution,Synthetic,686.4407999880334
+Three-phase,50.0,13026.272888470126,66.0,33.0,Power,Synthetic,637.2249930137734
+Three-phase,50.0,4355.923688173657,66.0,11.0,Distribution,Synthetic,236.117398685285
+Three-phase,50.0,11296.321611519554,11.0,0.22,Distribution,Synthetic,466.832594817106
+Three-phase,50.0,16945.769058267157,132.0,0.69,Power,Synthetic,803.2780577716096
+Three-phase,50.0,22198.367923759797,132.0,0.22,Power,Synthetic,862.2265046389804
+Three-phase,50.0,13326.52602373663,33.0,0.69,Power,Synthetic,774.8237009686812
+Three-phase,50.0,13256.24704150644,220.0,0.69,Distribution,Synthetic,674.4647084175035
+Three-phase,50.0,17690.44555647538,11.0,0.69,Distribution,Synthetic,776.9779973844688
+Three-phase,50.0,11956.41327422695,6.6,0.22,Power,Synthetic,525.511518839007
+Three-phase,50.0,21572.097673593908,132.0,3.3,Distribution,Synthetic,964.4142951286832
+Three-phase,60.0,15380.687963318927,132.0,33.0,Distribution,Synthetic,892.9401725414901
+Three-phase,50.0,11053.58330549489,220.0,0.433,Distribution,Synthetic,583.2525306341951
+Three-phase,60.0,12322.080982839032,6.6,3.3,Power,Synthetic,651.8472284515185
+Three-phase,50.0,9610.715471155409,11.0,33.0,Power,Synthetic,419.7139668092128
+Three-phase,50.0,14517.213290682255,33.0,33.0,Power,Synthetic,638.8493593106971
+Three-phase,50.0,14938.387032248238,6.6,11.0,Distribution,Synthetic,707.0119166681494
+Three-phase,50.0,10911.24366520959,6.6,0.22,Power,Synthetic,643.8717583910119
+Three-phase,50.0,4305.464370956781,33.0,6.6,Distribution,Synthetic,254.54035724933485
+Three-phase,50.0,19447.246647450836,132.0,3.3,Power,Synthetic,948.1025034272208
+Three-phase,50.0,6296.22663239857,33.0,0.69,Distribution,Synthetic,332.8658104843321
+Three-phase,50.0,22066.705824754536,400.0,11.0,Power,Synthetic,995.5315509578974
+Three-phase,50.0,19587.04816560109,400.0,0.22,Power,Synthetic,879.978338638956
+Three-phase,50.0,16109.894274057318,11.0,3.3,Distribution,Synthetic,738.8577973558134
+Three-phase,60.0,19088.80780555473,400.0,0.22,Power,Synthetic,873.2255736575994
+Single-phase,60.0,20880.593861322297,132.0,0.22,Power,Synthetic,955.7135922163528
+Three-phase,60.0,12252.61356024454,11.0,0.433,Distribution,Synthetic,542.0963832260865
+Single-phase,60.0,22440.060336735078,132.0,11.0,Power,Synthetic,946.1716398103453
+Three-phase,50.0,22883.57360880625,220.0,0.4,Power,Synthetic,904.36423950462
+Three-phase,50.0,10856.274111598092,400.0,0.69,Power,Synthetic,475.4537398972252
+Three-phase,50.0,6678.013752028687,11.0,0.4,Distribution,Synthetic,308.8236630409689
+Three-phase,50.0,16165.066001469037,220.0,0.69,Distribution,Synthetic,680.5460198987444
+Three-phase,50.0,19387.952701945716,33.0,6.6,Power,Synthetic,957.8107192450695
+Three-phase,50.0,5122.9026171558335,33.0,0.22,Distribution,Synthetic,286.4691796194996
+Three-phase,50.0,4664.792300321667,6.6,0.22,Power,Synthetic,205.83559741873665
+Three-phase,50.0,191003.9657655375,220.0,3.3,Power,Synthetic,9685.274027072634
+Single-phase,50.0,175356.38150405578,400.0,0.433,Power,Synthetic,8174.474223383267
+Three-phase,60.0,215499.1594142224,22.0,0.4,Power,Synthetic,9630.848649300367
+Three-phase,50.0,186043.9140434833,132.0,0.4,Distribution,Synthetic,7338.756490958837
+Three-phase,50.0,152490.20886460398,400.0,0.69,Distribution,Synthetic,9035.80066342682
+Three-phase,50.0,30176.845310265475,66.0,0.433,Distribution,Synthetic,1862.341559294987
+Three-phase,50.0,171390.11726422168,6.6,0.433,Distribution,Synthetic,7487.137986018965
+Three-phase,50.0,173415.35263211568,220.0,0.69,Power,Synthetic,7680.635513033844
+Three-phase,50.0,24216.438253906348,11.0,0.22,Instrument,Synthetic,1258.3324144286987
+Three-phase,50.0,66945.7583271457,66.0,0.4,Power,Synthetic,2665.4280262140387
+Three-phase,50.0,217240.27560106287,22.0,33.0,Power,Synthetic,8361.332270866958
+Single-phase,50.0,192381.91118324,33.0,33.0,Auto,Synthetic,8049.342230574447
+Three-phase,50.0,94057.74329251934,33.0,33.0,Distribution,Synthetic,3812.35615038714
+Three-phase,50.0,37663.11590930235,11.0,3.3,Distribution,Synthetic,2064.2870509481672
+Three-phase,50.0,78642.14501659898,6.6,0.433,Power,Synthetic,3564.0029459129505
+Three-phase,50.0,28379.606423223915,22.0,0.433,Power,Synthetic,1512.701703233214
+Three-phase,50.0,205204.80238215515,66.0,6.6,Power,Synthetic,8390.731426992843
+Three-phase,60.0,64013.39520473093,33.0,0.22,Power,Synthetic,3121.8814931677334
+Three-phase,50.0,19746.909479335907,33.0,11.0,Power,Synthetic,1059.3825030515973
+Three-phase,50.0,58587.44138403525,33.0,0.4,Instrument,Synthetic,2258.801155022524
+Three-phase,60.0,123691.5144518154,66.0,0.433,Power,Synthetic,5311.41723614964
+Three-phase,50.0,41573.06496633784,22.0,6.6,Distribution,Synthetic,1860.8815891566717
+Three-phase,60.0,231948.78150334317,6.6,33.0,Distribution,Synthetic,9093.708599635029
+Three-phase,50.0,38013.648758535055,132.0,0.69,Distribution,Synthetic,1703.4756852178168
+Three-phase,50.0,85374.14727363268,220.0,0.433,Power,Synthetic,3488.4423108348387
+Three-phase,50.0,239243.7123407699,11.0,3.3,Distribution,Synthetic,9944.141626540915
+Three-phase,50.0,100694.36413366254,132.0,0.69,Distribution,Synthetic,4353.295278817652
+Three-phase,60.0,158140.84475700205,33.0,11.0,Power,Synthetic,6674.91508794519
+Three-phase,50.0,100623.15317716636,6.6,3.3,Power,Synthetic,4098.365257166202
+Three-phase,50.0,110763.23069661124,66.0,3.3,Power,Synthetic,4979.368926158108
+Three-phase,50.0,431898.3482865256,6.6,3.3,Power,Synthetic,20474.73169300051
+Three-phase,50.0,1081260.1214468188,220.0,0.433,Distribution,Synthetic,44620.68611566468
+Three-phase,50.0,2010516.0985150032,400.0,0.22,Power,Synthetic,90769.30133595846
+Three-phase,60.0,845049.3603776484,6.6,3.3,Distribution,Synthetic,49240.62618949506
+Three-phase,50.0,778883.9889534656,11.0,11.0,Power,Synthetic,44931.33010149964
+Three-phase,50.0,1893208.5900861444,11.0,11.0,Power,Synthetic,81229.37657831865
+Single-phase,60.0,567540.1925073169,11.0,33.0,Power,Synthetic,27892.88726015793
+Three-phase,60.0,843001.5329798375,66.0,11.0,Distribution,Synthetic,46966.47475132556
+Three-phase,50.0,1373568.7789514093,6.6,0.69,Power,Synthetic,75955.97914267902
+Three-phase,50.0,644470.9528352502,220.0,0.22,Distribution,Synthetic,34153.34544487366

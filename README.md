@@ -17,6 +17,10 @@ A machine learning model to predict the price of electrical transformers based o
   - `model_evaluation.py`: Evaluate model performance
   - `predict.py`: Make predictions with trained models
   - `visualization.py`: Visualize data and results
+  - `material_prices.py`: Real-time material price fetching
+  - `transformer_data_scraper.py`: Scrape real transformer market data
+  - `market_data_integration.py`: Integrate market data with synthetic data
+  - `market_data_visualization.py`: Visualize market data comparison
 - `notebooks/`: Jupyter notebooks for exploration
 - `app.py`: Simple web application to use the model
 
@@ -29,13 +33,13 @@ A machine learning model to predict the price of electrical transformers based o
 ## Usage
 The model requires inputs of transformer specifications to predict price. See example in `notebooks/example_usage.ipynb`. 
 
-How it works:
+## How it works
 
-Transformer Price Calculator Overview
+### Transformer Price Calculator Overview
 
-This is a machine learning-based calculator for electrical transformer prices. Let me provide a brief overview of the built:
+This is a machine learning-based calculator for electrical transformer prices. Let me provide a brief overview of what's been built:
 
-A - Data Generation and Model Training
+#### A - Data Generation and Model Training
 ---------------------------------------
 
 1. Synthetic Data Generation: The system creates realistic transformer data with parameters like power ratings, voltage levels, material weights, and other specifications.
@@ -50,9 +54,7 @@ A - Data Generation and Model Training
 
 3. Model Performance: According to the results, Gradient Boosting performed best with an R² of 0.9873 (98.73% of variance explained), followed by Random Forest with an R² of 0.9822.
 
-
-
-B - Web Application Features
+#### B - Web Application Features
 ------------------------------
 The Streamlit application provides:
 
@@ -62,8 +64,7 @@ The Streamlit application provides:
 
 3. Educational Information: The "About Transformers" tab explains electrical transformers and factors affecting their pricing.
 
-
-C - How to Use the Application
+#### C - How to Use the Application
 -------------------------------
 
 1. Access the app at http://localhost:8501 in your web browser.
@@ -78,98 +79,82 @@ C - How to Use the Application
 
 4. Click "Calculate Transformer Price" to get a price estimate
 
-Possible Improvements
-Some potential enhancements you might consider:
-
-1. Real Data: Replace synthetic data with real market data for greater accuracy.
-2. More Features: Add additional technical specifications that affect pricing.
-3. Price History: Integrate a feature to track price changes over time.
-4. Material Price Integration: Link to current market prices of raw materials. DONE! 
-
-You can stop the Streamlit application when you're done by pressing Ctrl+C in the terminal or closing the terminal window
-
-
-
-MATERIAL COST UPDATE MODULE
+### Material Cost Update Module
 ---------------------------
 
-Implemented a comprehensive material cost module for your Transformer Price Calculator. Here's what the update includes:
+The project includes a comprehensive material cost module:
 
-1. Material Prices Module
-I've created a robust material_prices.py module with the following features:
-
+1. Material Prices Module:
   - Real-time material price fetching from the MetalpriceAPI (with a free tier option)
   - Fallback web scraping capability from London Metal Exchange for when API access isn't available
   - Local caching of material prices with staleness detection
   - Default material prices as a fallback when online sources aren't accessible
   - Conversion utilities to calculate material costs based on weights
 
-
 2. Price Calculation Integration
-The material costs are now fully integrated into the price prediction:
-
   - The application shows current material prices in USD/Ton
   - When calculating a transformer price, it breaks down the raw material costs
   - It shows the percentage of the total price that comes from raw materials vs. labor/overhead/profit
 
-
-3. Updated UI Features
-The application now has three well-organized tabs:
-
+3. UI Features
   - Price Calculator: Features the ML model selection, current material prices table, transformer specification form, and detailed price breakdown
   - Model Performance: Shows model comparison metrics and material price visualization
   - About Transformers: Provides educational information about transformers and material cost impacts
 
+### Real Market Data Integration
+---------------------------
 
-4. Material Cost Breakdown
-When calculating a transformer price, users now see:
+The project now includes tools to gather and utilize real market data:
 
-  - Total estimated price
-  - Raw material costs (with percentage)
-  - Labor, overhead & profit (with percentage)
-  - Detailed cost breakdown for each material (core, copper, insulation, tank, oil)
-  - Visual chart showing price components
+1. **Transformer Data Scraper**
+   - Scrapes real transformer price data from Volza.com
+   - Collects information from multiple countries and destinations
+   - Extracts key details: country of origin, destination, date, HSN code, quantity, description, and price
+   - Automatically extracts power ratings and other specifications from descriptions
+   - Saves data in structured CSV format for model training
 
+2. **Market Data Integration**
+   - Extracts features from scraped descriptions (voltage, phase, frequency, etc.)
+   - Combines real market data with synthetic data for model training
+   - Preserves data source information for comparison
+   - Provides analysis of price per KVA, origin countries, and more
 
-5. Fallback Mechanisms
-The system is designed to be robust:
+3. **Market Data Visualization**
+   - Creates visualizations comparing real market data with synthetic data
+   - Shows price vs. power rating relationships
+   - Displays price per KVA distributions
+   - Analyzes country of origin and destination impact on prices
+   - Generates insights on market trends and pricing factors
 
-  - It tries API access first
-  - Falls back to web scraping if API fails
-  - Uses cached data if it's recent
-  - Provides default prices as a last resort
-  - Generates slightly randomized prices for demonstration purposes if all else fails
+### Using the Scraper
 
+To gather real transformer market data:
 
-Key Features Added:
---------------------
-1. Real-time material price updates
-2. Material cost breakdown visualization
-3. Price composition analysis (materials vs. labor/overhead)
-4. Current material prices visualization
-5. Context-aware material type matching for flexible inputs
+```bash
+# Basic usage (uses default URLs)
+python run_scraper.py
 
+# Specify custom URLs to scrape
+python run_scraper.py --urls https://www.volza.com/p/electrical-transformer/import/import-in-france/ https://www.volza.com/p/electrical-transformer/import/import-in-germany/
 
-You can access the app at http://localhost:8501 and see all these new features in action. The material cost breakdown provides valuable insights into how raw material prices impact the total transformer cost, making this a more comprehensive pricing tool.
+# Load existing scraped data without scraping again
+python run_scraper.py --load-only
+```
 
+After scraping, you can integrate the data with your model:
 
+```bash
+# Run the market data integration to prepare data for model training
+python src/market_data_integration.py
 
-Labor, overhead, and profit
-------------------------------
+# Create visualizations comparing real and synthetic data
+python src/market_data_visualization.py
+```
 
-Implemented a solution to adjust the labor, overhead, and profit percentage for large transformers. Here's what my changes do:
-Adjusted Pricing Model for Large Transformers
-Size Threshold: I've set 5000 kVA as the threshold for "large transformers" - above this size, the economies of scale adjustment begins to apply.
-Scaling Factor: The adjustment uses a logarithmic scaling factor based on how much larger the transformer is than the threshold. This ensures that:
-Very large transformers (e.g., 100,000+ kVA) get a significant adjustment
-Moderately large transformers (e.g., 10,000 kVA) get a modest adjustment
-Transformers near the threshold get minimal adjustment
-Target Percentage: The algorithm reduces the labor, overhead, and profit percentage from whatever the model initially predicted to a target range of 30-40% for the largest transformers, which aligns with your industry knowledge.
-Price Adjustment: Instead of just changing the display percentages, the code recalculates the total price based on the adjusted labor, overhead, and profit amount, giving you a more realistic final estimate.
-Transparency: The app shows both the original model estimate and the adjusted price with a clear explanation of the adjustment.
-Benefits of This Approach
-Industry-Standard Economics: This change better reflects the economies of scale in transformer manufacturing, where larger units have a lower percentage of labor costs relative to material costs.
-More Competitive Pricing: For very large transformers, the adjusted prices will be more in line with market expectations and more competitive.
-Maintains Material Cost Accuracy: The raw material cost calculation remains unchanged and accurate based on current material prices.
-Flexible Implementation: The scaling factor approach means we don't need hard cutoffs - the adjustment gradually increases with transformer size.
-Try entering specifications for a large transformer (>5000 kVA) in the app to see how the price adjustment works. The larger the transformer, the more significant the adjustment will be, gradually bringing the labor, overhead, and profit percentage down toward the 30-40% range you specified.
+## Possible Improvements
+Some potential enhancements you might consider:
+
+1. More Sources: Expand data scraping to additional sources for greater market coverage.
+2. More Features: Add additional technical specifications that affect pricing.
+3. Price History: Integrate a feature to track price changes over time.
+4. Geographical Models: Train separate models for different regions to capture market differences.

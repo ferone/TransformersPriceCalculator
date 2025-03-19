@@ -27,6 +27,8 @@ try:
     from src.predict import predict_price, load_model, get_model_metrics, calculate_raw_material_cost, get_material_costs_dataframe
     from src.material_prices import get_material_prices_dataframe as get_current_prices_dataframe
     from src.weight_estimator import estimate_weights_from_power_and_voltage
+    # Import our new bridge module
+    from src.transformer_bridge import predict_transformer_price, get_all_model_predictions
 except ImportError as e:
     st.error(f"Import error: {str(e)}")
     st.info("Attempting to load functions from alternate locations...")
@@ -83,6 +85,24 @@ except ImportError as e:
                 "oil_weight": round(total_weight * 0.30, 1),      # 30% oil
                 "total_weight": round(total_weight, 1)
             }
+    
+    # Try to import our bridge module with fallback
+    try:
+        from src.transformer_bridge import predict_transformer_price, get_all_model_predictions
+    except ImportError:
+        def predict_transformer_price(app_specs, model_name='random_forest'):
+            """Fallback function"""
+            st.error("Bridge module not found. Prediction may fail.")
+            try:
+                model = load_model(model_name)
+                return predict_price(model, app_specs), []
+            except Exception as e:
+                raise ValueError(f"Error in prediction: {str(e)}")
+        
+        def get_all_model_predictions(app_specs):
+            """Fallback function"""
+            st.error("Bridge module not found. Prediction may fail.")
+            return {}
 
 # Add CSS to improve the appearance and layout of the app
 st.markdown("""
@@ -248,8 +268,20 @@ def price_calculator_tab():
         selected_model = st.selectbox(
             "Select Prediction Model",
             list(available_models.keys()),
-            index=0
+            help="Choose which machine learning model to use for price prediction"
         )
+        
+        # Add option to compare all models
+        compare_all_models = st.checkbox(
+            "Compare all models", 
+            value=False,
+            help="Get predictions from all available models and compare them"
+        )
+        
+        # Display model metrics if available
+        if selected_model in metrics:
+            model_metrics = metrics[selected_model]
+            st.write(f"Model performance: R² = {model_metrics.get('r2_score', 'N/A'):.3f}, MAE = ${model_metrics.get('mae', 'N/A'):,.2f}")
     
     with col2:
         if selected_model in metrics:
@@ -597,7 +629,19 @@ def price_calculator_tab():
             
             # Predict price
             with st.spinner("Calculating price..."):
-                predicted_price = predict_price(model, transformer_specs)
+                try:
+                    # Use our new bridge module for prediction
+                    model_name = selected_model.lower().replace(" ", "_")
+                    predicted_price, warnings = predict_transformer_price(transformer_specs, model_name)
+                    
+                    # Display any warnings
+                    if warnings:
+                        with st.expander("Prediction Warnings/Notes"):
+                            for warning in warnings:
+                                st.warning(warning)
+                except Exception as e:
+                    st.error(f"Error calculating price: {str(e)}")
+                    predicted_price = 0
             
             # Calculate material costs
             try:
@@ -618,6 +662,45 @@ def price_calculator_tab():
                     st.markdown(f"### Estimated Price")
                     st.markdown(f"<h2 style='color:#1E88E5;'>${predicted_price:,.2f}</h2>", unsafe_allow_html=True)
                     st.write(f"Estimated using {selected_model}")
+                    
+                    # Display all model predictions if requested
+                    if compare_all_models:
+                        st.markdown("### All Model Predictions")
+                        try:
+                            all_predictions = get_all_model_predictions(transformer_specs)
+                            
+                            # Create a dataframe for the predictions
+                            prediction_data = []
+                            for model_name, (price, warnings) in all_predictions.items():
+                                if price is not None:
+                                    formatted_price = f"${price:,.2f}"
+                                    warning_count = len(warnings) if warnings else 0
+                                    prediction_data.append({
+                                        "Model": model_name,
+                                        "Predicted Price": formatted_price,
+                                        "Warnings": warning_count
+                                    })
+                            
+                            if prediction_data:
+                                predictions_df = pd.DataFrame(prediction_data)
+                                st.dataframe(predictions_df)
+                                
+                                # Show bar chart of predictions
+                                fig, ax = plt.subplots(figsize=(10, 6))
+                                models = [d["Model"] for d in prediction_data]
+                                prices = [float(d["Predicted Price"].replace("$", "").replace(",", "")) for d in prediction_data]
+                                
+                                sns.barplot(x=models, y=prices, ax=ax)
+                                ax.set_title("Price Predictions Across Models")
+                                ax.set_xlabel("Model")
+                                ax.set_ylabel("Predicted Price (USD)")
+                                ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+                                plt.tight_layout()
+                                st.pyplot(fig)
+                            else:
+                                st.info("No valid predictions available from other models.")
+                        except Exception as e:
+                            st.error(f"Error comparing models: {str(e)}")
                     
                     # Show breakdown
                     st.markdown("#### Price Composition")
@@ -647,11 +730,11 @@ def price_calculator_tab():
                         
                         # Update the values for the chart
                         predicted_price = adjusted_price
-                        values = [material_cost_total, adjusted_lop_amount]
+                        values_for_chart = [material_cost_total, adjusted_lop_amount]
                     else:
                         st.markdown(f"**Raw Materials:** ${material_cost_total:,.2f} ({material_cost_total/predicted_price*100:.1f}% of total)")
                         st.markdown(f"**Labor, Overhead & Profit:** ${predicted_price - material_cost_total:,.2f} ({(predicted_price - material_cost_total)/predicted_price*100:.1f}% of total)")
-                        values = [material_cost_total, predicted_price - material_cost_total]
+                        values_for_chart = [material_cost_total, predicted_price - material_cost_total]
                 
                 with col2:
                     st.markdown("### Raw Material Costs Breakdown")
@@ -668,7 +751,7 @@ def price_calculator_tab():
                     st.subheader("Price Components")
                     fig, ax = plt.subplots(figsize=(6, 4))  # Reduced figure size
                     components = ['Raw Materials', 'Labor, Overhead & Profit']
-                    values = values  # Use the values set above
+                    values = values_for_chart  # Use the values set above
                     colors = ['#1976D2', '#4CAF50']
                     
                     ax.bar(components, values, color=colors)
